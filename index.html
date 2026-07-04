@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agatha Christie - A Legacy of Mystery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@400;700;900&display=swap');
+        
+        body { 
+            scroll-behavior: smooth; 
+            font-family: 'Noto Serif JP', serif;
+            position: relative;
+        }
+
+        /* スクリーンショット2026-07-04 23.02.04.jpgのザラザラした高級感ある質感をシミュレートするノイズレイヤー */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .title-font { font-family: 'Cinzel', serif; }
+        
+        /* タイムラインアニメーション */
+        .timeline-card {
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .timeline-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 本の表紙スタイル */
+        .book-cover {
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .book-cover:hover { transform: scale(1.05) rotate(2deg); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fee2e2; }
+        ::-webkit-scrollbar-thumb { background: #d92534; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-[#d92534] text-stone-900 antialiased min-h-screen">
+
+    <header class="py-24 text-center text-white bg-[#d92534] relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white blur-3xl"></div>
+        </div>
+        <h1 class="title-font text-6xl md:text-9xl font-black tracking-tighter mb-4">Agatha Christie</h1>
+
+        <div class="mt-12 flex justify-center gap-2">
+            <div class="h-1 w-12 bg-white/50"></div>
+            <div class="h-1 w-24 bg-white"></div>
+            <div class="h-1 w-12 bg-white/50"></div>
+        </div>
+
+        <p class="title-font text-2xl md:text-4xl font-medium tracking-[0.35em] uppercase text-red-100 mt-8 opacity-90 drop-shadow-sm">Famous works Timeline</p>
+    </header>
+
+    <main class="relative max-w-4xl mx-auto px-6">
+        <!-- 左側に固定されるスクロール連動の年表示。メインの範囲内だけで追従し、下の締めのセクションには干渉しません -->
+        <div id="sticky-year" class="sticky top-1/4 hidden md:flex flex-col items-center justify-center w-48 h-48 bg-stone-50 rounded-lg shadow-2xl z-10 border-t-8 border-[#d92534]">
+            <span class="text-xs text-stone-400 font-bold tracking-[0.2em] uppercase mb-1">Chronicle</span>
+            <span id="current-year" class="text-6xl font-black text-stone-900">1890</span>
+        </div>
+
+        <div id="timeline-container" class="relative mt-10 md:ml-64">
+            <!-- タイムラインの縦線。コンテナの中で1976年に向けて降下します -->
+            <div class="absolute left-6 md:left-0 top-0 bottom-0 w-0.5 bg-white/20"></div>
+        </div>
+    </main>
+
+    <!-- 締めの言葉セクション（スクリーンショット 2026-07-04 23.02.04.jpg のような空間美を再現） -->
+    <section class="relative bg-gradient-to-b from-[#d92534] to-[#b81b28] text-white pt-24 pb-48 px-6 overflow-hidden border-t border-white/10">
+        <div class="max-w-3xl mx-auto text-center flex flex-col items-center">
+            
+            <!-- 区切りのためのシンプルな和・洋融合デコレーション -->
+            <div class="mb-20 flex items-center justify-center gap-4 w-full opacity-40">
+                <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-white"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-white"></div>
+            </div>
+
+            <!-- JINS提灯をモチーフにしつつ、アガサ・クリスティの世界観へと昇華させたアンティークシンボル -->
+            <div class="mb-16 transform hover:scale-102 transition-transform duration-700 select-none filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]">
+                <svg class="w-48 md:w-56 h-auto" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 上部の吊り下げ金具（提灯リスペクト・アンティーク調） -->
+                    <path d="M100 10V25" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M80 25C80 18 120 18 120 25" stroke="#2c2c2c" stroke-width="3" fill="none"/>
+                    
+                    <!-- 本体（提灯のようなふっくらとした楕円を、クラシックな陶器・羊皮紙のアイボリー色で） -->
+                    <rect x="30" y="25" width="140" height="230" rx="70" fill="#fcfaf2" stroke="#1c1c1c" stroke-width="4"/>
+                    
+                    <!-- 内部の繊細なヴィンテージ装飾境界線 -->
+                    <rect x="36" y="31" width="128" height="218" rx="64" fill="none" stroke="#d92534" stroke-width="1" stroke-dasharray="4 2"/>
+                    <rect x="40" y="35" width="120" height="210" rx="60" fill="none" stroke="#1c1c1c" stroke-width="1.5"/>
+                    
+                    <!-- 上下の枠（真鍮や漆の質感をイメージした黒い帯） -->
+                    <path d="M65 25H135" stroke="#1c1c1c" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M65 255H135" stroke="#1c1c1c" stroke-width="6" stroke-linecap="round"/>
+                    
+                    <!-- エンブレム内テキスト -->
+                    <text x="100" y="72" fill="#d92534" font-family="'Cinzel', serif" font-weight="900" font-size="12" text-anchor="middle" letter-spacing="0.3em">AGATHA</text>
+                    
+                    <!-- 中央のシンボリックなイニシャル "A" -->
+                    <text x="102" y="158" fill="#1c1c1c" font-family="'Cinzel', serif" font-weight="900" font-size="78" text-anchor="middle">A</text>
+                    
+                    <!-- 装飾ライン -->
+                    <line x1="65" y1="185" x2="135" y2="185" stroke="#1c1c1c" stroke-width="1.2"/>
+                    <circle cx="100" cy="185" r="3.5" fill="#d92534"/>
+                    
+                    <text x="100" y="215" fill="#1c1c1c" font-family="'Cinzel', serif" font-weight="700" font-size="10.5" text-anchor="middle" letter-spacing="0.25em">QUEEN OF</text>
+                    <text x="100" y="233" fill="#1c1c1c" font-family="'Cinzel', serif" font-weight="700" font-size="10.5" text-anchor="middle" letter-spacing="0.25em">MYSTERY</text>
+                </svg>
+            </div>
+
+            <!-- 詩的なエッセイテキスト（JINSの言葉のように深く心に浸透するよう余白・文字間を極限まで引き締めたデザイン） -->
+            <div class="space-y-16 mt-4">
+                <h2 class="title-font text-3xl md:text-5xl font-extrabold tracking-[0.25em] text-red-100 mb-10 drop-shadow-sm">
+                    Who was Agatha Christie?
+                </h2>
+                
+                <p class="text-base md:text-xl font-medium tracking-[0.18em] leading-[2.4] text-white/90 max-w-2xl mx-auto px-4">
+                    アガサ・クリスティーは、イギリス生まれの作家です。<br class="hidden sm:inline">
+                    『オリエント急行の殺人』や『そして誰もいなくなった』などで知られ、<br class="hidden sm:inline">
+                    「ミステリーの女王」と呼ばれています。
+                </p>
+                
+                <p class="text-base md:text-xl font-medium tracking-[0.18em] leading-[2.4] text-white/95 max-w-2xl mx-auto px-4">
+                    けれど、彼女の魅力は巧妙なトリックだけではありません。<br class="hidden sm:inline">
+                    人の言葉、沈黙、しぐさ、嫉妬、不安、思い込み。<br class="hidden sm:inline">
+                    日常の中にひそむ小さな違和感を見つめ、<br class="hidden sm:inline">
+                    それを物語へと変えていった人でした。
+                </p>
+            </div>
+            
+            <!-- 最後の美しい締め（写真なし・上品なテキストと極細ライン） -->
+            <div class="mt-28 flex flex-col items-center">
+                <!-- 静けさを引き立てる極細の区切り線 -->
+                <div class="h-[1px] w-12 bg-white/25 mb-8"></div>
+                <!-- Cinzelフォントを使ったエレガントなネーム表記 -->
+                <span class="title-font text-lg md:text-2xl tracking-[0.35em] text-red-100 uppercase font-medium">
+                    Agatha Christie (1890–1976)
+                </span>
+            </div>
+            
+            <!-- 最下部の余韻を引きずる極細グラデーションライン -->
+            <div class="mt-24 flex flex-col items-center gap-4">
+                <span class="title-font text-[10px] tracking-[0.5em] uppercase text-red-200 opacity-30">The End</span>
+
+                <!-- アガサ・クリスティの肖像写真（小さく上品に） -->
+                <img src="images.jpeg" alt="Agatha Christie" class="mt-6 w-28 md:w-32 h-auto rounded-md object-cover shadow-2xl ring-1 ring-white/30 grayscale hover:grayscale-0 transition-all duration-700">
+
+                <div class="mt-6 h-24 w-[1px] bg-gradient-to-b from-white to-transparent opacity-30"></div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const works = [
+            { year: "1890", desc: "イギリス・トーキーに生まれる", type: "birth" },
+            { year: "1920", title: "スタイルズ荘の怪事件", desc: "ポアロ、華麗なる初登場。" },
+            { year: "1922", title: "秘密機関", desc: "トミー＆タペンスシリーズ開幕。" },
+            { year: "1923", title: "嘘つきは殺人のはじまり", desc: "ポアロが挑む愛と復讐の物語。" },
+            { year: "1926", title: "アクロイド殺し", desc: "ミステリー史に残る究極のトリック。" },
+            { year: "1930", title: "牧師館の殺人", desc: "ミス・マープル、初登場。" },
+            { year: "1934", title: "オリエント急行の殺人", desc: "雪の列車でポアロが謎に挑む。" },
+            { year: "1936", title: "ABC殺人事件", desc: "アルファベット順 of 連続殺人。" },
+            { year: "1937", title: "ナイルに死す", desc: "豪華客船で起きる悲劇の殺人事件。" },
+            { year: "1939", title: "そして誰もいなくなった", desc: "孤島に招かれた10人の絶望。" },
+            { year: "1942", title: "五匹の子豚", desc: "過去の事件を回想して解く傑作。" },
+            { year: "1949", title: "ねじれた家", desc: "異様な一族を襲う戦慄の殺人。" },
+            { year: "1952", title: "マウストラップ", desc: "世界最長のロングラン劇。" },
+            { year: "1963", title: "鏡は横にひび割れて", desc: "女優の影に潜む殺意のドラマ。" },
+            { year: "1971", title: "復讐の女神", desc: "マープルシリーズの集大成。" },
+            { year: "1976", title: "カーテン", desc: "ポアロ、永遠の別れ。" },
+            { year: "1976", desc: "85歳で亡くなる", type: "death" }
+        ];
+
+        const container = document.getElementById('timeline-container');
+        const yearDisplay = document.getElementById('current-year');
+
+        works.forEach((work, index) => {
+            const div = document.createElement('div');
+            div.dataset.year = work.year;
+            
+            if (work.type === "birth" || work.type === "death") {
+                // 特別仕様（誕生・没年）：重複する数字を完全に排除し、テキストのみを美しく魅せるデザイン
+                // 没年（death）の場合は、その下でタイムラインが綺麗に終わるよう mb-0 に設定
+                const mbClass = work.type === "death" ? "mb-0" : "mb-20";
+                div.className = `timeline-card ${mbClass} pl-16 md:pl-12 relative group`;
+                div.innerHTML = `
+                    <div class="absolute left-5 md:-left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border-4 border-red-300 rounded-full group-hover:bg-white group-hover:border-white transition-colors z-20"></div>
+                    <div class="flex items-center py-4 select-none">
+                        <!-- テキストのみをシンプルかつ極めて印象的に配置 -->
+                        <div class="text-white text-xl md:text-3xl font-bold tracking-widest leading-relaxed">
+                            ${work.desc}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 通常仕様（作品）：白いカード形式
+                div.className = "timeline-card mb-20 pl-16 md:pl-20 relative group";
+                const colors = ["bg-stone-800", "bg-red-800", "bg-stone-700", "bg-red-900"];
+                const color = colors[index % colors.length];
+                
+                div.innerHTML = `
+                    <div class="absolute left-5 md:-left-4 top-2 w-8 h-8 bg-white border-4 border-red-200 rounded-full group-hover:bg-[#d92534] group-hover:border-white transition-colors z-20"></div>
+                    <div class="bg-white p-8 rounded-lg shadow-xl flex items-center gap-8 border-l-4 border-[#d92534]">
+                        <div class="book-cover w-24 h-32 hidden sm:block rounded ${color} flex items-center justify-center text-white/20 font-black text-4xl select-none">
+                            A
+                        </div>
+                        <div>
+                            <span class="text-[#d92534] font-bold text-sm tracking-widest">${work.year}</span>
+                            <h2 class="text-3xl font-bold text-stone-900 mt-1 mb-3">${work.title}</h2>
+                            <p class="text-stone-600 leading-relaxed">${work.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            container.appendChild(div);
+        });
+
+        // スクロール監視
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    yearDisplay.textContent = entry.target.dataset.year;
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.timeline-card').forEach(card => observer.observe(card));
+    </script>
+</body>
+</html>
